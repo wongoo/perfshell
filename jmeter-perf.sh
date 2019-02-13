@@ -1,26 +1,26 @@
 #!/bin/sh
 
 # server host to monitor
-host=192.168.0.2
+host=10.104.110.72
 
 # process name on host to provide service
 # which is used to monitor memory usage of process
 process=java
 
-# test url of host service 
-url=http://192.168.0.2/user
-
 scp calccpu.sh $host:/tmp
 scp calcmem.sh $host:/tmp
 scp memstat.sh $host:/tmp
 
-for n in 10 100 500 1000
+# ----------------------------
+# jmeter test
+# ----------------------------
+for n in 1 5 10
 do
 	num=$(($n * 10000))
 	for c in 10 50 100 200
 	do
 		echo $num, $c
-		/tmp/abtest.sh $num $c $process $host $url
+		/tmp/jmeter-test.sh $num $c $process $host
 		sleep 30
 	done
 done
