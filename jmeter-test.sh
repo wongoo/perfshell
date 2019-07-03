@@ -7,30 +7,32 @@ url=$5
 
 loops=$((reqnum / threads))
 
-memstatfile="/tmp/jmeter-$reqnum-$threads-$process.memstat"
-vmstatfile="/tmp/jmeter-$reqnum-$threads-$process.vmstat"
-jmeterjtl="/tmp/jmeter-$reqnum-$threads-$process.jtl"
-rm -f $jmeterjtl
+memstat_file="/tmp/jmeter-$reqnum-$threads-$process.memstat"
+vmstat_file="/tmp/jmeter-$reqnum-$threads-$process.vmstat"
+jmeter_jtl="/tmp/jmeter-$reqnum-$threads-$process.jtl"
+rm -f ${jmeter_jtl}
 
-ssh -n $host "nohup /tmp/memstat.sh $process $memstatfile >/dev/null 2>&1 &"
-ssh -n $host "nohup vmstat 5 >$vmstatfile  &"
+ssh -n ${host} "nohup sh /tmp/memstat.sh $process $memstat_file >/dev/null 2>&1 &"
+ssh -n ${host} "nohup vmstat 5 >$vmstat_file  &"
 sleep 5
 
+
+
 #-----------------------<<<< jmeter TEST START
-echo "start jmeter $reqnum,$threads,$loops,$process"
-jmeter -n -t test.jmx -l $jmeterjtl -Jthreads=$threads -Jloops=$loops
-echo "end jmeter $reqnum,$threads,$loops,$process"
+echo "---------------------------------------"
+echo "start jmeter request number: $reqnum, thread: $threads,loop: $loops, process: $process"
+jmeter -n -t test.jmx -l ${jmeter_jtl} -Jthreads=${threads} -Jloops=${loops}
+echo "end jmeter request number: $reqnum, thread: $threads,loop: $loops, process: $process"
 #-----------------------<<<< jmeter TEST END
 
-ssh $host "ps aux | grep -v grep | grep memstat  | cut -c 9-15 | xargs --no-run-if-empty kill -9"
-ssh $host "ps aux | grep -v grep | grep vmstat  | cut -c 9-15 | xargs --no-run-if-empty kill -9"
+ssh ${host} "ps aux | grep -v grep | grep memstat  | cut -c 9-15 | xargs --no-run-if-empty kill -9"
+ssh ${host} "ps aux | grep -v grep | grep vmstat  | cut -c 9-15 | xargs --no-run-if-empty kill -9"
 
-ssh $host "/tmp/calcmem.sh $memstatfile" > /tmp/jmeter-mem.txt
-ssh $host "/tmp/calccpu.sh $vmstatfile" > /tmp/jmeter-cpu.txt
+ssh ${host} "sh /tmp/calcmem.sh $memstat_file" > /tmp/jmeter-mem.txt
+ssh ${host} "sh /tmp/calccpu.sh $vmstat_file" > /tmp/jmeter-cpu.txt
 
 mem=$(cat /tmp/jmeter-mem.txt)
 cpu=$(cat /tmp/jmeter-cpu.txt)
 
 echo "$reqnum,$threads,$process, cpu: $cpu, mem: $mem"
 echo "$reqnum,$threads,$process, cpu: $cpu, mem: $mem" >> /tmp/jmeter-perf-result.txt
-
