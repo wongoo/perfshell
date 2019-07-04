@@ -14,13 +14,12 @@ scp memstat.sh ${host}:/tmp
 # ----------------------------
 # jmeter test
 # ----------------------------
-for n in 1 5 10
+for threads in 10 50 100 200
 do
-	num=$(($n * 10000))
-	for concurrent in 10 50 100 200
+	for loops in 20 50
 	do
-		echo "------> ${num}, ${concurrent}"
-		sh jmeter-test.sh ${num} ${concurrent} ${process} ${host}
+        echo "------> request threads: ${threads}, loops: $loops"
+		sh jmeter-test.sh ${threads} ${loops} ${process} ${host}
 		sleep 30
 	done
 done

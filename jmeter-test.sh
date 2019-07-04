@@ -1,15 +1,13 @@
 #!/bin/bash
-reqnum=$1
-threads=$2
+threads=$1
+loops=$2
 process=$3
 host=$4
 url=$5
 
-loops=$((reqnum / threads))
-
-memstat_file="/tmp/jmeter-$reqnum-$threads-$process.memstat"
-vmstat_file="/tmp/jmeter-$reqnum-$threads-$process.vmstat"
-jmeter_jtl="/tmp/jmeter-$reqnum-$threads-$process.jtl"
+memstat_file="/tmp/jmeter-$threads-$loops-$process.memstat"
+vmstat_file="/tmp/jmeter-$threads-$loops-$process.vmstat"
+jmeter_jtl="/tmp/jmeter-$threads-$loops-$process.jtl"
 rm -f ${jmeter_jtl}
 
 ssh -n ${host} "nohup sh /tmp/memstat.sh $process $memstat_file >/dev/null 2>&1 &"
@@ -20,9 +18,9 @@ sleep 5
 
 #-----------------------<<<< jmeter TEST START
 echo "---------------------------------------"
-echo "start jmeter request number: $reqnum, thread: $threads,loop: $loops, process: $process"
+echo "start jmeter request thread: $threads,loop: $loops, process: $process"
 jmeter -n -t test.jmx -l ${jmeter_jtl} -Jthreads=${threads} -Jloops=${loops}
-echo "end jmeter request number: $reqnum, thread: $threads,loop: $loops, process: $process"
+echo "end jmeter request thread: $threads,loop: $loops, process: $process"
 #-----------------------<<<< jmeter TEST END
 
 ssh ${host} "ps aux | grep -v grep | grep memstat  | cut -c 9-15 | xargs --no-run-if-empty kill -9"
@@ -34,5 +32,5 @@ ssh ${host} "sh /tmp/calccpu.sh $vmstat_file" > /tmp/jmeter-cpu.txt
 mem=$(cat /tmp/jmeter-mem.txt)
 cpu=$(cat /tmp/jmeter-cpu.txt)
 
-echo "$reqnum,$threads,$process, cpu: $cpu, mem: $mem"
-echo "$reqnum,$threads,$process, cpu: $cpu, mem: $mem" >> /tmp/jmeter-perf-result.txt
+echo "$threads,$loops,$process, cpu: $cpu, mem: $mem"
+echo "$threads,$loops,$process, cpu: $cpu, mem: $mem" >> /tmp/jmeter-perf-result.txt
