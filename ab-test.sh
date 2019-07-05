@@ -14,8 +14,8 @@ ab_file="/tmp/ab-$concurrent-$loops-$process.ab"
 rm -f ${ab_file}
 
 ssh -n ${host} "nohup sh /tmp/memstat.sh $process $memstat_file >/dev/null 2>&1 &"
-ssh -n ${host} "nohup vmstat 5 >$vmstat_file  &"
-sleep 5
+ssh -n ${host} "nohup vmstat 2 >$vmstat_file  &"
+sleep 2
 
 echo "---------------------------------------"
 echo "start ab concurrent: $concurrent, loops: $loops, process: $process"

@@ -11,8 +11,8 @@ jmeter_jtl="/tmp/jmeter-$threads-$loops-$process.jtl"
 rm -f ${jmeter_jtl}
 
 ssh -n ${host} "nohup sh /tmp/memstat.sh $process $memstat_file >/dev/null 2>&1 &"
-ssh -n ${host} "nohup vmstat 5 >$vmstat_file  &"
-sleep 5
+ssh -n ${host} "nohup vmstat 2 >$vmstat_file  &"
+sleep 2
 
 echo "---------------------------------------"
 echo "start jmeter request thread: $threads,loop: $loops, process: $process"
