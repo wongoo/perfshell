@@ -17,14 +17,13 @@ scp memstat.sh ${host}:/tmp
 
 # test url of host service 
 url=http://192.168.0.2/user
- 
-for n in 10 100 500 1000
+
+for concurrent in 10 50 100 200
 do
-	num=$(($n * 10000))
-	for concurrent in 10 50 100 200
-	do
-		echo "------> $${num}, ${concurrent}"
-		sh ab-test.sh ${num} ${concurrent} ${process} ${host} ${url}
+	for loops in 100 200
+    do
+		echo "------> concurrent: ${concurrent}, loops: ${loops}"
+		sh ab-test.sh ${concurrent} ${loops} ${process} ${host} ${url}
 		sleep 30
 	done
 done
