@@ -7,9 +7,9 @@ host=10.104.110.72
 # which is used to monitor memory usage of process
 process=java
 
-scp calccpu.sh ${host}:/tmp
-scp calcmem.sh ${host}:/tmp
-scp memstat.sh ${host}:/tmp
+scp calc_vmstat_cpu.sh ${host}:/tmp
+scp calc_ps_mem.sh ${host}:/tmp
+scp ps_stat.sh ${host}:/tmp
 
 # ----------------------------
 # jmeter test
@@ -19,7 +19,7 @@ do
 	for loops in 20 50
 	do
         echo "------> request threads: ${threads}, loops: $loops"
-		sh jmeter-test.sh ${threads} ${loops} ${process} ${host}
+		sh jmeter_test.sh ${threads} ${loops} ${process} ${host}
 		sleep 30
 	done
 done
